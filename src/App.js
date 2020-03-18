@@ -68,6 +68,10 @@ function App() {
 */
 
 class App extends React.Component{
+  constructor(props){
+    super(props);
+    console.log("constructor hello"); //render()의 console.log보다 먼저 호출됨
+  }
   state = {
     count : 0
   };
@@ -78,8 +82,17 @@ class App extends React.Component{
   minus = () => {
     this.setState(current => ({ count : current.count - 1 }));
   };
-
+  componentDidMount() {
+    console.log("component rendered");
+  }
+  componentDidUpdate(){
+    console.log("i just updated");
+  }
+  componentWillUnmount(){
+    console.log("good bye");  //실행되는게 보이지는 않지만 실행되는거 맞음
+  }
   render(){
+    console.log("rendering");
     return <div>
         <h1>Number {this.state.count}</h1>
         <button onClick={this.add}>add</button>
@@ -117,4 +130,23 @@ export default App;
   >>setState를 호출하면 새 state와 render function 이 호출된다.
   * state는 object이므로, setState는 새로운 state를 받아야한다.
   react 는 virtual Dom을 이용하기 때문에 변한 부분만 바꾸면서, 매우빠르게, 깜박거림도 없당
+*/
+
+/* 
+  life cycle method 기본적으로 react가 component를 생성하고 없애는 방법
+  component가 render될때 호출되는 다른 function들이 있다.
+  mounting : component가 생성되는것
+    - constructor() : constructor는 시작전에 호출된다.
+    - staticgetDerivedStateFromProps() : 범위넘어가서 생략
+    - render()
+    - componentDidMount()
+  Updating : update
+    - static getDerivedStateFromProps()
+    - shouldComponentUpdate() : 업데이트 할말 결정
+    - render()
+    - getSnapshotBeforeUpdate()
+    - componentDidUpdate()
+    - setState를 호출하면 component를 호출하고 먼저 render를 호출한다음 업데이트가 완료되었을때 componentDidUpdate가 실행됨
+  Unmounting : component가 죽는것(페이지가 바뀔때)
+    - componentWillUnmount() 
 */
