@@ -1,9 +1,11 @@
 import React from 'react';
 //import Potato from './potato';
 import PropTypes from "prop-types";
+import axios from "axios";
+import Movie from "./Movie";
+import "./App.css";
 
 /*
-
 const foodIlike = [
   {
     id:1,
@@ -66,7 +68,7 @@ function App() {
  * /
 }
 */
-
+/* state 제어와 lifecycle
 class App extends React.Component{
   constructor(props){
     super(props);
@@ -102,7 +104,7 @@ class App extends React.Component{
 }
 
 export default App;
-
+*/
 // 2 1 Reusable Components with JSX
 /*
    Component 에서 Component로, children component로 정보 보내기 
@@ -139,7 +141,7 @@ export default App;
     - constructor() : constructor는 시작전에 호출된다.
     - staticgetDerivedStateFromProps() : 범위넘어가서 생략
     - render()
-    - componentDidMount()
+    - componentDidMount() : render 하면 제일 먼저 실행되는  method
   Updating : update
     - static getDerivedStateFromProps()
     - shouldComponentUpdate() : 업데이트 할말 결정
@@ -150,3 +152,64 @@ export default App;
   Unmounting : component가 죽는것(페이지가 바뀔때)
     - componentWillUnmount() 
 */
+
+class App extends React.Component {
+  state = {
+    isLoading: true,  
+    movies : []
+  };  
+  getMovies = async () => {
+    //const movies = await axios.get("https://yts-proxy.now.sh/list_movies.json");
+    //console.log(movies.data.data.movies);
+    const {data: {data : {movies}}} = await axios.get("https://yts-proxy.now.sh/list_movies.json?sort_by=rating");
+    this.setState({movies, isLoading : false}); //this.setState({movies : movies}); 와 같다
+  };
+  componentDidMount(){  //componentDidMount에서 data를 fetch해야한다
+  //async componentDidMount()
+    /* 
+    setTimeout(()=> {
+      this.setState({isLoading : false, book : true});
+      //미래에 쓰고자 하는 state를 선언하는 것은 필수가 아니다.
+    }, 6000);
+    */
+
+    //4.0 fetching Movies from Api
+    //const movies =  axios.get("https://yts-proxy.now.sh/list_movies.json");
+    //axios 가 시간이 걸릴수도 있기 때문에 이를 기다리게 하기 위해 componentDidMount 앞에 async를 붙히거나, 
+    //새로 function getMovies을 생성하여 그 내부에서 axios를 호출한다.
+    this.getMovies();
+  }
+  render() {
+    const { isLoading, movies } = this.state;
+    
+    return (
+      <section className="container">
+        {isLoading ? (
+          <div className="loader">
+            <span className="loader_text">
+              Loading..
+            </span>
+          </div>
+          ) : (
+            <div className="movies">
+              {movies.map(movie =>  (
+                <Movie 
+                  key={movie.id} 
+                  id={movie.id} 
+                  year={movie.year} 
+                  title={movie.title} 
+                  summary={movie.summary} 
+                  poster={movie.medium_cover_image} 
+                  genres={movie.genres}
+                />
+              ))}
+            </div>
+          )
+        }
+      </section>
+    )
+  }
+}
+
+export default App;
+//https://yts-proxy.now.sh/list_movies.json
